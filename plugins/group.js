@@ -6,9 +6,6 @@ Raganork MD - Sourav KL11
 const {
     getString
 } = require('./misc/lang');
-const {
-      saveMessage
-  } = require('./misc/saveMessage');
 const Lang = getString('group');
 const {
     isAdmin,
@@ -104,24 +101,18 @@ Module({
     
     return await message.client.groupLeave(message.jid);
 }))
+// QUOTED - COPYRIGHT: souravkl11/raganork
 Module({
     pattern: 'quoted',
     fromMe: true,
     desc:"Sends replied message's replied message. Useful for recovering deleted messages."
 }, (async (message, match) => {
-    if (!message.isGroup) return await message.sendReply(Lang.GROUP_COMMAND)
     try {
-    var msg = (await message.client.getMessages(message.jid)).filter(e=>e.key.id===message.reply_message.id)
+    var msg = await message.client.store.toJSON()?.messages[message.jid]?.toJSON().filter(e=>e.key.id===message.reply_message.id)
     var quoted = msg[0].message[Object.keys(msg[0].message)].contextInfo;
-    var obj = {
-        key: {
-          remoteJid: message.jid,
-          fromMe: quoted.participant===message.myjid+"@s.whatsapp.net",
-          id: quoted.stanzaId,
-          participant: quoted.participant
-        },
-        message: quoted.quotedMessage
-      }
+    var quoted2 = await message.client.store.toJSON()?.messages[message.jid]?.toJSON().filter(e=>e.key.id===quoted.stanzaId)
+    if (quoted2.length) return await message.forwardMessage(message.jid,quoted2[0]);
+    var obj = {key: {remoteJid: message.jid,fromMe: true,id: quoted.stanzaId,participant: quoted.participant},message: quoted.quotedMessage}
     return await message.forwardMessage(message.jid,obj);
     } catch { return await message.sendReply("_Failed to load message!_") }
 })) /*
