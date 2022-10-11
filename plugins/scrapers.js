@@ -148,10 +148,12 @@ Module({
     match = match[1] ? match[1] : message.reply_message.text
     match = match.match(/\bhttps?:\/\/\S+/gi)[0]
     var quoted = message.reply_message ? message.quoted : message.data;
-    if (match.includes("images.app.goo")) match = await extractGoogleImage(match)
+    if (match.includes("images.app.goo")) match = (await axios(match)).data.match(/(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])/gi).filter(e=>e.endsWith("jpg")||e.endsWith("png")||e.endsWith("jpeg"))[0]
     let file = await skbuffer(match)
     let {mime} = await fromBuffer(file)
-    await message.client.sendMessage(message.jid,{document:file,mimetype:mime,fileName:"Content from "+match},{quoted});
+    if (mime.includes("png")||mime.includes("jpeg")) return await message.send(file,"image",{quoted})
+    if (mime.includes("video")) return await message.send(file,"video",{quoted})
+    await message.client.sendMessage(message.jid,{document:file,mimetype:mime,fileName:"Content from "+match.split("/")[2]},{quoted});
 }));
 Module({
     pattern: 'doc ?(.*)',
@@ -300,15 +302,11 @@ Module({
 }, async (message, match) => {
     if (!match[1]) return await message.sendReply("*Need url*");
     var {link,title,size} = (await axios("https://raganork-network.vercel.app/api/mediafire?url="+match[1])).data
-    var mediaFire = [{
-        urlButton: {
-            displayText: 'Download',
-            url: link
-        }
-    }]
-   var header = "_File:_ "+title+"\n _Size:_ "+size+"\n _Click this button to download_"
-return await message.sendImageTemplate(await skbuffer("https://play-lh.googleusercontent.com/Br7DFOmd9GCUmXdyTnPVqNj_klusX0OEx6MrElu8Avl2KJ7wbsS7dBdci293o7vF4fk"),header,"Mediafire Downloader",mediaFire)
-});
+    await message.sendReply(`_*Downloading file.. [${size.trim()}]*_`);
+    let document = await skbuffer(link)
+    let {mime} = await fromBuffer(document)
+    await message.client.sendMessage(message.jid,{document,fileName:title, mimetype:mime},{quoted: message.data});
+    });
 Module({
     pattern: 'ss ?(.*)',
     fromMe: w,
