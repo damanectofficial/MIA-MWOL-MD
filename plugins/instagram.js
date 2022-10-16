@@ -37,7 +37,7 @@ let sourav = setting.MODE == 'public' ? false : true
 Module({
     pattern: 'insta ?(.*)',
     fromMe: sourav,
-    desc: 'Instagram post downloader',
+    desc: 'Instagram post/reel/tv/highlights downloader',
     usage: 'insta link or reply to a link',
     use: 'download'
 }, (async (msg, query) => {
@@ -50,10 +50,10 @@ Module({
     }, {
         quoted: msg.data
     })
-    var getid = /(?:https?:\/\/)?(?:www\.)?(?:instagram\.com(?:\/.+?)?\/(p|reel|tv)\/)([\w-]+)(?:\/)?(\?.*)?$/
+    var getid = /(?:https?:\/\/)?(?:www\.)?(?:instagram\.com(?:\/.+?)?\/(p|s|reel|tv)\/)([\w-]+)(?:\/)?(\?.*)?$/
     var url = getid.exec(q)
     if (url != null) {
-        try { var res = await downloadGram(url[0]) } catch { return await msg.sendReply("_Broken link! Try another one._") }
+        try { var res = await downloadGram(url[0]) } catch { return await msg.sendReply("_Something went wrong, Please try again!_") }
         if (res == false) return await msg.sendReply("*Download failed*");
         var quoted = msg.reply_message ? msg.quoted : msg.data
         for (var i in res) {
@@ -113,16 +113,14 @@ Module({
     var user = query[1] !== '' ? query[1] : msg.reply_message.text;
     if (user && user.includes("/reel/") || user.includes("/tv/") || user.includes("/p/")) return;
     if (!user) return await msg.sendReply(need_acc_s);
-    if (/\bhttps?:\/\/\S+/gi.test(user)) user = user.match(/\bhttps?:\/\/\S+/gi)[0]
-    var unam = user.startsWith('https') ? user.split('/')[4] : user
-    try { var res = await story(user) } catch {return await msg.sendReply("*Sorry, server error*")}
-    var StoryData = []
-  
+    user = !/\bhttps?:\/\/\S+/gi.test(user) ? `https://instagram.com/stories/${user}/` : user.match(/\bhttps?:\/\/\S+/gi)[0]
+     try { var res = await downloadGram(user) } catch {return await msg.sendReply("*_Sorry, server error_*")}
+    var StoryData = [];
     for (var i in res){
     StoryData.push({
       title: "Story "+Math.floor(parseInt(i)+1),
-      description: "Type: "+res[i].type,
-      rowId: "igs "+msg.myjid+" "+user+" "+i
+      description: res[i].includes("mp4")?"Video":"Photo",
+      rowId: `${setting.HANDLERS !== 'false'? setting.HANDLERS.split("")[0]:""}upload ${res[i]}`
   })
   }
   const sections = [{
@@ -130,7 +128,7 @@ Module({
       rows: StoryData
   }];
   const listMessage = {
-      text: "_Account:_ "+unam,
+      text: " ",
       footer: "_Total stories: " + res.length+"_",
       title: "_Download your stories_",
       buttonText: "View all",
