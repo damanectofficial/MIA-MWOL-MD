@@ -49,6 +49,12 @@ Module({pattern: 'updt',use: 'owner', fromMe: true,dontAddCommandList: true, des
         return await message.client.sendMessage(message.jid, { text:"_Bot up to date_"})
 
     } else {
+        if (!__dirname.startsWith("/skl")){
+        await require("simple-git")().reset("hard",["HEAD"])
+        await require("simple-git")().pull()
+        await message.sendReply("_Successfully updated. Please manually update npm modules if applicable!_")
+        process.exit(0);    
+    }
         await message.client.sendMessage(message.jid, { text:"_Started update.._"})
 
             try {

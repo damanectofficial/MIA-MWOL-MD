@@ -31,110 +31,67 @@ Module({
   desc: 'Is bot alive?'
 }, (async (message, match) => {
   var myid = message.client.user.id.split(":")[0]
-  var buttons = [{
-    urlButton: {
-        displayText: 'Github',
-        url: 'https://github.com/souravkl11/raganork'
+  const buttons = [
+    {buttonId: 'ping '+myid, buttonText: {displayText:'ᴛᴇsᴛ ᴘɪɴɢ'}, type: 1},
+    {buttonId: 'support '+myid, buttonText: {displayText:'ʙᴏᴛ ɢʀᴏᴜᴘ' }, type: 1},
+    {buttonId: 'commands '+myid, buttonText: {displayText: 'ᴄᴏᴍᴍᴀɴᴅs'}, type: 1}
+  ]
+  
+  function shuffleArray(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
     }
-}, {
-  urlButton: {
-    displayText: 'Contact Owner',
-    url: 'https://wa.me/'+BOT_INFO.split(";")[2]+'?text=*Hey+'+BOT_INFO.split(";")[1]+'*'
+    return array;
+    }    
+  let use_ = commands.map(e=>e.use)
+  const others = (use) => { return use == '' ? 'others' : use}
+  let types = shuffleArray(use_.filter((item,index) => use_.indexOf(item) === index).map(others))
+  var cmd_obj = {}
+  for (var command of commands){
+    let type_det = types.includes(command.use)?command.use:"others";
+    if (!cmd_obj[type_det]?.length) cmd_obj[type_det] = []
+    let cmd_name = command.pattern?.toString().match(/(\W*)([A-Za-z1234567890 ]*)/)[2]
+    if (cmd_name) cmd_obj[type_det].push(cmd_name)
+  }
+  let final = ''
+  var i = 0;
+  for (var n of types){
+    for (var x of cmd_obj[n]){
+        i=i+1
+        var newn = n.charAt(0).toUpperCase()+n.replace(n.charAt(0),"")
+        final+=`${final.includes(newn)?'':'\n\n╭════〘 *_'+newn+"_* 〙════⊷❍\n"}\n┃✰│ _${i}. ${x.trim()}_${cmd_obj[n]?.indexOf(x)===(cmd_obj[n]?.length-1) ?`\n┃✰╰─────────────────❍\n╰══════════════════⊷❍`:''}`
     }
-}, {
-    quickReplyButton: {
-        displayText: 'All commands',
-        id: 'commands'+myid
-    }  
-}, {
-    quickReplyButton: {
-        displayText: 'Support group',
-        id: 'support'+myid
-    }
-}]
-var gc=commands.filter(a=>"group"===a.use),lgc=commands.filter(a=>"logo"===a.use),tc=commands.filter(a=>"textmaker"===a.use),oc=commands.filter(a=>"owner"===a.use),dc=commands.filter(a=>"download"===a.use),ec=commands.filter(a=>"edit"===a.use),sc=commands.filter(a=>"search"===a.use),uc=commands.filter(a=>"utility"===a.use),setarr=[...gc,...dc,...tc,...oc,...ec,...sc,...uc]
-var gmsg="",ownmsg="",dlmsg="",utilmsg="",srmsg="",tms="",lms="",edmsg="";
-for (var i in setarr) {
-if (setarr[i].use === 'group') {
-  gmsg += `┃❉│ ${Math.floor(parseInt(i)+1)}. ${setarr[i].pattern.toString().match(/(\W*)([A-Za-zğüşıiöç1234567890 ]*)/)[2]} \n`
-}
-if (setarr[i].use === 'download') {
-  dlmsg += `┃❉│ ${Math.floor(parseInt(i)+1)}. ${setarr[i].pattern.toString().match(/(\W*)([A-Za-zğüşıiöç1234567890 ]*)/)[2]} \n`
-}
-if (setarr[i].use === 'textmaker') {
-  tms += `┃❉│ ${Math.floor(parseInt(i)+1)}. ${setarr[i].pattern.toString().match(/(\W*)([A-Za-zğüşıiöç1234567890 ]*)/)[2]} \n`
-}
-if (setarr[i].use === 'owner') {
-  ownmsg += `┃❉│ ${Math.floor(parseInt(i)+1)}. ${setarr[i].pattern.toString().match(/(\W*)([A-Za-zğüşıiöç1234567890 ]*)/)[2]} \n`
-}
-if (setarr[i].use === 'edit') {
-  edmsg += `┃❉│ ${Math.floor(parseInt(i)+1)}. ${setarr[i].pattern.toString().match(/(\W*)([A-Za-zğüşıiöç1234567890 ]*)/)[2]} \n`
-}
-if (setarr[i].use === 'search') {
-  srmsg += `┃❉│ ${Math.floor(parseInt(i)+1)}. ${setarr[i].pattern.toString().match(/(\W*)([A-Za-zğüşıiöç1234567890 ]*)/)[2]} \n`
-}
-if (setarr[i].use === 'utility') {
-  utilmsg += `┃❉│ ${Math.floor(parseInt(i)+1)}. ${setarr[i].pattern.toString().match(/(\W*)([A-Za-zğüşıiöç1234567890 ]*)/)[2]} \n`
-}
-}
+  }
+  let cmdmenu = final.trim();
   var menu = `╭═══〘 ${BOT_INFO.split(";")[0]} 〙═══⊷❍
-┃❉╭──────────────
-┃❉│
-┃❉│ Owner : ${BOT_INFO.split(";")[1]}
-┃❉│ User : ${message.senderName}
-┃❉│ Mode : ${MODE}
-┃❉│ Server : ${config.HEROKU.APP_NAME}
-┃❉│ Total RAM: ${total}
-┃❉│ Available RAM: ${used}
-┃❉│ Disk Space: 620 GB
-┃❉│ Version: ${config.VERSION}
-┃❉│
-┃❉│
-┃❉│  ▎▍▌▌▉▏▎▌▉▐▏▌▎
-┃❉│  ▎▍▌▌▉▏▎▌▉▐▏▌▎
-┃❉│   ${BOT_INFO.split(";")[0]}
-┃❉│ 
-┃❉╰───────────────
+┃✰╭──────────────
+┃✰│
+┃✰│ Owner : ${BOT_INFO.split(";")[1]}
+┃✰│ User : ${message.senderName.replace( /[\r\n]+/gm, "" )}
+┃✰│ Mode : ${MODE}
+┃✰│ Server : ${__dirname.startsWith('/skl')?"Heroku":"Private (VPS)"}
+┃✰│ Available RAM: ${used} of ${total}
+┃✰│ Version: ${config.VERSION}
+┃✰│
+┃✰│
+┃✰│  ▎▍▌▌▉▏▎▌▉▐▏▌▎
+┃✰│  ▎▍▌▌▉▏▎▌▉▐▏▌▎
+┃✰│   ${BOT_INFO.split(";")[0]}
+┃✰│ 
+┃✰╰───────────────
 ╰═════════════════⊷
 
-╭════〘 Group 〙════⊷❍
-┃❉╭─────────────────
-┃❉│ 
-${gmsg}
-┃❉╰─────────────────
-╰══════════════════⊷❍
-╭════〘 Download 〙════⊷❍
-┃❉╭─────────────────
-┃❉│ 
-${dlmsg}
-┃❉╰─────────────────
-╰══════════════════⊷❍
-╭════〘 Logo Maker 〙════⊷❍
-┃❉╭─────────────────
-┃❉│ 
-┃❉│ logo
-${tms}
-┃❉╰─────────────────
-╰══════════════════⊷❍
-╭════〘 Owner 〙════⊷❍
-┃❉╭─────────────────
-┃❉│ 
-${ownmsg}
-┃❉╰─────────────────
-╰══════════════════⊷❍
-╭════〘 Edit 〙════⊷❍
-┃❉╭─────────────────
-┃❉│ 
-${edmsg}
-┃❉╰─────────────────
-╰══════════════════⊷❍
-╭════〘 Search 〙════⊷❍
-┃❉╭─────────────────
-┃❉│ 
-${srmsg}
-┃❉╰─────────────────
-╰══════════════════⊷❍`
-return await message.sendImageTemplate(await skbuffer(BOT_INFO.split(";")[3]),FancyRandom(menu),"All rights reserved "+BOT_INFO.split(";")[0],buttons);
+${cmdmenu}`
+return await message.client.sendMessage(message.jid,{
+  image: await skbuffer(BOT_INFO.split(";")[3]||`https://picsum.photos/800/500`),
+  caption: FancyRandom(menu),
+  footer: BOT_INFO.split(";")[0],
+  buttons: buttons,
+  headerType: 4
+})
 }))
 Module({
   pattern: 'alive',
@@ -169,13 +126,30 @@ Module({
   desc: 'Measures ping'
 }, (async (message, match) => {
   const start = new Date().getTime()
-  await message.client.sendMessage(message.jid, {
-      text: '*❮ ᴛᴇsᴛɪɴɢ ᴘɪɴɢ ❯*'
-  })
+  await message.send('*❮ ᴛᴇsᴛɪɴɢ ᴘɪɴɢ ❯*')
   const end = new Date().getTime()
-  await message.client.sendMessage(message.jid, {
-      text: '*ʀᴇsᴘᴏɴsᴇ ɪɴ ' + (end - start) + ' _ᴍs_*'
-  }, {
-      quoted: message.data
-  })
+  await message.sendReply('*ʟᴀᴛᴇɴᴄʏ: ' + (end - start) + ' _ᴍs_*')
+}));
+Module({
+  pattern: 'uptime',
+  fromMe: w,
+  use: 'utility',
+  desc: 'Shows system (OS) /process uptime'
+}, (async (message, match) => {
+  var ut_sec = require("os").uptime(); 
+  var ut_min = ut_sec/60; 
+  var ut_hour = ut_min/60; 
+  ut_sec = Math.floor(ut_sec); 
+  ut_min = Math.floor(ut_min); 
+  ut_hour = Math.floor(ut_hour); 
+  ut_hour = ut_hour%60; 
+  ut_min = ut_min%60; 
+  ut_sec = ut_sec%60; 
+  var uptime_os = (`_System (OS) : ${ut_hour} Hour(s), ${ut_min} minute(s) and ${ut_sec} second(s)_`)  
+  var sec_num = parseInt(process.uptime(), 10);
+  var hours   = Math.floor(sec_num / 3600);
+  var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+  var seconds = sec_num - (hours * 3600) - (minutes * 60);
+  var uptime_process = (`_Process : ${hours} Hour(s), ${minutes} minute(s) and ${seconds} second(s)_`)  
+  return await message.sendReply(`                 _*[ UP-TIME ]*_\n\n${uptime_os}\n${uptime_process}`);
 }));
