@@ -16,6 +16,34 @@ const {
     Module
 } = require('../main')
 Module({
+    pattern: 'wapoll ?(.*)',
+    fromMe: true,
+    desc: "Creates poll (WhatsApp feature)",
+    use: 'group',
+    usage: '.wapoll Poll title,option,option,option'
+}, (async (message, match) => {
+    if (!message.isGroup) return await message.sendReply(Lang.GROUP_COMMAND)
+    if (!match[1]) return await message.sendReply(`_Need params!_\n_.wapoll title,option,option_`)
+    match = match[1].split(',')
+    const buttons = [];
+    for (let i = 1; i < match.length; i++) {
+    buttons.push({optionName: match[i]})
+    }
+    await message.client.relayMessage(message.jid, { senderKeyDistributionMessage: {groupId: message.jid}, messageContextInfo: {messageSecret: "LzBNJaq8ZGE/2hn5bUplPvecdDxTSI1qduEbbIMI5J4="}, pollCreationMessage: { name: match[0], options: buttons, selectableOptionsCount: 0 } }, {});
+}));
+Module({
+    pattern: 'clear ?(.*)',
+    fromMe: true,
+    desc: "Clear chat",
+    use: 'misc'
+}, (async (message, match) => {
+    await message.client.chatModify({
+        delete: true,
+        lastMessages: [{ key: message.data.key, messageTimestamp:message.data.messageTimestamp }]
+      },message.jid)
+    return await message.send("_Chat cleared!_")  
+}));
+    Module({
     pattern: 'kick ?(.*)',
     fromMe: true,
     desc: Lang.KICK_DESC,
