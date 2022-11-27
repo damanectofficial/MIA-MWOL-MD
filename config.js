@@ -24,7 +24,7 @@ module.exports = {
     SESSION: process.env.SESSION.trim() || '',
     IMGBB_KEY: ["76a050f031972d9f27e329d767dd988f","deb80cd12ababea1c9b9a8ad6ce3fab2","78c84c62b32a88e86daf87dd509a657a"],
     RG: process.env.RG || '919074309534-1632403322@g.us',
-    BOT_INFO: process.env.BOT_INFO || 'Raganork;Skl11;0;https://i.ibb.co/tHSDGKq/IMG-20221122-WA0052-picsay.jpg;wa/me',
+    BOT_INFO: process.env.BOT_INFO || 'Raganork;Skl11;0;https://i.ibb.co/tHSDGKq/IMG-20221122-WA0052-picsay.jpg;Https://wa.me/6283872273467?text=Assalamualaikum',
     RBG_KEY: process.env.RBG_KEY || '',
     ALLOWED: process.env.ALLOWED || '91,94,212',
     CHATBOT: process.env.CHATBOT || 'off',
